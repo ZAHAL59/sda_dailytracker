@@ -517,6 +517,14 @@
       console.warn('No video file found — running in demo mode (simulated 240s video)');
       setupDemo();
     });
+    
+    // Force demo mode if no valid video src
+    setTimeout(() => {
+      if (!vid.src || vid.src === '') {
+        console.warn('Empty video src — activating demo mode');
+        setupDemo();
+      }
+    }, 100);
 
     // ── VIDEO EVENTS ──────────────────────────────────────
     vid.addEventListener('loadedmetadata', () => {
