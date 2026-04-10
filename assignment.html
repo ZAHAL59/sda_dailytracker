@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assignment</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --card: #1e1e26;
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #f0eeff;
+      --muted: rgba(240, 238, 255, 0.45);
+      --dim: rgba(240, 238, 255, 0.18);
+      --violet: #7c5cfc;
+      --teal: #00d4aa;
+      --amber: #ffb547;
+      --rose: #ff6b8a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      color: var(--text);
+    }
+
+    .page-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--violet);
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      margin-bottom: 6px;
+      line-height: 1.2;
+    }
+
+    .sub-info {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .q-card.filled {
+      border-color: rgba(0, 212, 170, 0.25);
+    }
+
+    .q-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--violet);
+      margin-bottom: 8px;
+    }
+
+    .q-text {
+      font-weight: 600;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      margin-bottom: 12px;
+    }
+
+    .ans-textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      resize: vertical;
+      min-height: 90px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .ans-textarea:focus {
+      border-color: var(--violet);
+    }
+
+    .ans-textarea:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .char-count {
+      font-size: 0.72rem;
+      color: var(--dim);
+      text-align: right;
+      margin-top: 4px;
+    }
+
+    /* MCQ style too */
+    .opts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .opt-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .opt-btn:hover:not(.disabled) {
+      border-color: rgba(124, 92, 252, 0.4);
+      background: rgba(124, 92, 252, 0.07);
+    }
+
+    .opt-btn.sel {
+      border-color: var(--violet);
+      background: rgba(124, 92, 252, 0.15);
+    }
+
+    .opt-btn.disabled {
+      cursor: default;
+    }
+
+    .submit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-top: 6px;
+    }
+
+    .submit-info {
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+
+    .filled-count {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--violet);
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, var(--violet), #5b3fcf);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .submit-btn:hover {
+      filter: brightness(1.12);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      filter: none;
+    }
+
+    /* Done overlay */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .done-overlay.show {
+      display: flex;
+    }
+
+    .done-box {
+      background: var(--card);
+      border: 1px solid rgba(0, 212, 170, 0.35);
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .done-icon {
+      font-size: 4rem;
+      margin-bottom: 12px;
+    }
+
+    .done-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--teal);
+      margin-bottom: 8px;
+    }
+
+    .done-msg {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+
+    .done-xp {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 2rem;
+      color: var(--amber);
+      margin-bottom: 18px;
+    }
+
+    .go-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--violet), #5b3fcf);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    @media(max-width:500px) {
+      .opts {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <a class="back-btn" href="tracker.html">← Back to Tracker</a>
+
+    <div class="page-tag">📚 Assignment · Chapter 1</div>
+    <h1>The Wonderful World of Science</h1>
+    <div class="sub-info">Answer all questions below. Submit when done — your tracker will update automatically.</div>
+
+    <div id="q-area"></div>
+
+    <div class="submit-row">
+      <div class="submit-info">
+        <div class="filled-count"><span id="filled-count">0</span> / <span id="total-count">0</span> answered</div>
+        <div style="font-size:0.78rem;margin-top:2px">Submit to auto-check your tracker ✦</div>
+      </div>
+      <button class="submit-btn" id="submit-btn" onclick="submitAssignment()">Submit Assignment ✓</button>
+    </div>
+  </div>
+
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-box">
+      <div class="done-icon">📚</div>
+      <div class="done-title">Assignment Submitted!</div>
+      <div class="done-xp">+20 XP</div>
+      <div class="done-msg">Your answers have been saved and your tracker has been automatically updated!</div>
+      <a class="go-btn" href="tracker.html">← Back to Tracker</a>
+    </div>
+  </div>
+
+  <script>
+    const SIGNAL_KEY = 'studytracker_signal';
+    const SIGNAL_ID = 'signal_assignment';
+
+    // ── QUESTIONS ─────────────────────────────────────
+    // 🔧 Edit these! Mix text answers (type:'text') and MCQs (type:'mcq')
+    const QUESTIONS = [
+      { type: 'text', q: 'What is Science? Write in your own words.' },
+      { type: 'mcq', q: 'Which is the correct order of the Scientific Method?', opts: ['Experiment → Observation → Conclusion', 'Observation → Question → Hypothesis → Experiment → Analysis → Conclusion', 'Question → Hypothesis → Observation', 'Conclusion → Experiment → Data'], ans: 1 },
+      { type: 'text', q: 'What is the difference between an Observation and an Inference? Give one example of each.' },
+      { type: 'mcq', q: 'A scientist observes that plants grow taller when given more light. What is this an example of?', opts: ['An experiment', 'A hypothesis', 'An observation', 'A conclusion'], ans: 2 },
+      { type: 'text', q: 'Name any three branches of Science and write one thing each branch studies.' },
+      { type: 'mcq', q: 'Which instrument would you use to look at a bacterium?', opts: ['Telescope', 'Magnifying glass', 'Microscope', 'Binoculars'], ans: 2 },
+    ];
+
+    let answers = new Array(QUESTIONS.length).fill(null);
+    let submitted = false;
+
+    function renderAll() {
+      const area = document.getElementById('q-area');
+      area.innerHTML = '';
+      document.getElementById('total-count').textContent = QUESTIONS.length;
+
+      QUESTIONS.forEach((q, i) => {
+        const div = document.createElement('div');
+        div.className = 'q-card' + (answers[i] !== null && answers[i] !== '' ? ' filled' : '');
+        if (q.type === 'text') {
+          div.innerHTML = `
+        <div class="q-num">Question ${i + 1}</div>
+        <div class="q-text">${q.q}</div>
+        <textarea class="ans-textarea" id="ans-${i}" placeholder="Write your answer here…" ${submitted ? 'disabled' : ''} oninput="textChange(${i},this.value)">${answers[i] || ''}</textarea>
+        <div class="char-count" id="cc-${i}">${(answers[i] || '').length} characters</div>`;
+        } else {
+          div.innerHTML = `
+        <div class="q-num">Question ${i + 1}</div>
+        <div class="q-text">${q.q}</div>
+        <div class="opts">${q.opts.map((o, j) => `
+          <button class="opt-btn ${answers[i] === j ? 'sel' : ''} ${submitted ? 'disabled' : ''}" onclick="${submitted ? '' : 'mcqPick(' + i + ',' + j + ')'}">${o}</button>`).join('')}
+        </div>`;
+        }
+        area.appendChild(div);
+      });
+      updateCount();
+    }
+
+    function textChange(i, val) {
+      answers[i] = val.trim() !== '' ? val : null;
+      document.getElementById('cc-' + i).textContent = val.length + ' characters';
+      document.getElementById('q-area').children[i].className = 'q-card' + (answers[i] ? ' filled' : '');
+      updateCount();
+    }
+
+    function mcqPick(i, j) {
+      if (submitted) return;
+      answers[i] = j;
+      renderAll();
+    }
+
+    function updateCount() {
+      const filled = answers.filter(a => a !== null && a !== '').length;
+      document.getElementById('filled-count').textContent = filled;
+      document.getElementById('submit-btn').disabled = (filled === 0);
+    }
+
+    function submitAssignment() {
+      if (submitted) return;
+      const filled = answers.filter(a => a !== null && a !== '').length;
+      if (filled === 0) return;
+      submitted = true;
+
+      const today = new Date();
+      const dateKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      let signals = {};
+      try { signals = JSON.parse(localStorage.getItem(SIGNAL_KEY)) || {}; } catch (e) { }
+      signals[SIGNAL_ID] = { date: dateKey, ts: Date.now(), processed: false };
+      localStorage.setItem(SIGNAL_KEY, JSON.stringify(signals));
+
+      document.getElementById('done-overlay').classList.add('show');
+    }
+
+    renderAll();
+  </script>
+</body>
+
+</html>

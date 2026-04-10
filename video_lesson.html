@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Lesson</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --card: #1e1e26;
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #f0eeff;
+      --muted: rgba(240, 238, 255, 0.45);
+      --violet: #7c5cfc;
+      --teal: #00d4aa;
+      --amber: #ffb547;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .chapter-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--violet);
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      margin-bottom: 16px;
+      line-height: 1.2;
+    }
+
+    /* Video Player */
+    .player-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .video-area {
+      position: relative;
+      background: #000;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.4);
+      transition: opacity 0.2s;
+    }
+
+    .play-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .play-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(124, 92, 252, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      transition: transform 0.2s;
+    }
+
+    .play-icon:hover {
+      transform: scale(1.08);
+    }
+
+    /* Custom controls */
+    .controls {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 1.1rem;
+      padding: 4px;
+      transition: color 0.2s;
+      line-height: 1;
+    }
+
+    .ctrl-btn:hover {
+      color: var(--text);
+    }
+
+    .progress-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .prog-bar-wrap {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .prog-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--violet), var(--teal));
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+
+    .prog-watched {
+      height: 100%;
+      border-radius: 99px;
+      background: rgba(0, 212, 170, 0.25);
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    .time-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .vol-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type=range].vol-slider {
+      width: 70px;
+      accent-color: var(--violet);
+    }
+
+    /* Progress banner */
+    .watch-banner {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .watch-ring {
+      flex-shrink: 0;
+    }
+
+    .watch-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .wb-text {
+      flex: 1;
+    }
+
+    .wb-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .wb-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .wb-status {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+
+    .wb-status.pending {
+      background: rgba(255, 181, 71, 0.12);
+      color: var(--amber);
+    }
+
+    .wb-status.done {
+      background: rgba(0, 212, 170, 0.12);
+      color: var(--teal);
+    }
+
+    /* Done overlay */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .done-overlay.show {
+      display: flex;
+    }
+
+    .done-box {
+      background: var(--card);
+      border: 1px solid rgba(0, 212, 170, 0.4);
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .done-icon {
+      font-size: 4rem;
+      margin-bottom: 12px;
+    }
+
+    .done-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--teal);
+      margin-bottom: 8px;
+    }
+
+    .done-msg {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .done-xp {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 2rem;
+      color: var(--amber);
+      margin-bottom: 18px;
+    }
+
+    .go-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--violet), #5b3fcf);
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .go-btn:hover {
+      filter: brightness(1.12);
+      transform: translateY(-2px);
+    }
+
+    /* Notes area */
+    .notes-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .notes-section h3 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .note-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .note-item:last-child {
+      border-bottom: none;
+    }
+
+    .note-time {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--violet);
+      background: rgba(124, 92, 252, 0.12);
+      border-radius: 6px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .note-time:hover {
+      background: rgba(124, 92, 252, 0.25);
+    }
+
+    .note-text {
+      font-size: 0.86rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <a class="back-btn" href="tracker.html">← Back to Tracker</a>
+
+    <div class="chapter-tag">Chapter 1 · Class 6 Science</div>
+    <h1>🔭 The Wonderful World of Science</h1>
+
+    <!-- Watch progress banner -->
+    <div class="watch-banner">
+      <div class="watch-ring">
+        <svg width="52" height="52" viewBox="0 0 52 52">
+          <circle cx="26" cy="26" r="20" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="5" />
+          <circle id="ring-c" cx="26" cy="26" r="20" fill="none" stroke="url(#rg)" stroke-width="5"
+            stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="125.6"
+            style="transition:stroke-dashoffset 0.3s" />
+          <defs>
+            <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#7c5cfc" />
+              <stop offset="100%" stop-color="#00d4aa" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="wb-text">
+        <div class="wb-title" id="wb-title">Watch to unlock completion</div>
+        <div class="wb-sub" id="wb-sub">Watch at least 80% of this video to auto-check your tracker</div>
+      </div>
+      <div class="wb-status pending" id="wb-status">⏳ Watching</div>
+    </div>
+
+    <!-- Video player -->
+    <div class="player-wrap">
+      <div class="video-area" id="video-area" onclick="togglePlay()">
+        <!--
+        REPLACE THE <video> TAG SRC WITH YOUR ACTUAL VIDEO FILE OR URL.
+        Supported: local .mp4, .webm, or hosted video URLs.
+        Example: <video id="vid" src="videos/ch1_science.mp4" preload="metadata"></video>
+        
+        For YouTube: use the YouTube iframe API instead — see comment at bottom of file.
+      -->
+        <video id="vid" preload="metadata">
+          <source src="your-video-here.mp4" type="video/mp4">
+          <!-- If no video file yet, the demo uses a synthetic duration via JS below -->
+        </video>
+        <div class="play-overlay" id="play-overlay">
+          <div class="play-icon" id="play-icon">▶</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="ctrl-btn" onclick="togglePlay()" id="play-btn">▶</button>
+        <div class="progress-area">
+          <div class="prog-bar-wrap" id="prog-wrap" onclick="seekTo(event)">
+            <div class="prog-watched" id="prog-watched" style="width:0%"></div>
+            <div class="prog-bar-fill" id="prog-fill" style="width:0%"></div>
+          </div>
+          <div class="time-label"><span id="curr-time">0:00</span> / <span id="dur-time">0:00</span></div>
+        </div>
+        <div class="vol-row">
+          <span style="font-size:0.9rem">🔊</span>
+          <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.05" value="1"
+            oninput="setVol(this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Chapter notes -->
+    <div class="notes-section">
+      <h3>📌 Key Points — Jump to Timestamp</h3>
+      <div class="note-item">
+        <div class="note-time" onclick="jumpTo(5)">0:05</div>
+        <div class="note-text">Introduction to Science — what it means and why we study it</div>
+      </div>
+      <div class="note-item">
+        <div class="note-time" onclick="jumpTo(30)">0:30</div>
+        <div class="note-text">The Scientific Method — 6 steps explained with examples</div>
+      </div>
+      <div class="note-item">
+        <div class="note-time" onclick="jumpTo(80)">1:20</div>
+        <div class="note-text">Observation vs Inference — key difference with activities</div>
+      </div>
+      <div class="note-item">
+        <div class="note-time" onclick="jumpTo(130)">2:10</div>
+        <div class="note-text">Branches of Science — Biology, Chemistry, Physics overview</div>
+      </div>
+      <div class="note-item">
+        <div class="note-time" onclick="jumpTo(190)">3:10</div>
+        <div class="note-text">Summary and important terms to remember</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DONE OVERLAY -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-box">
+      <div class="done-icon">🎬</div>
+      <div class="done-title">Video Complete!</div>
+      <div class="done-xp">+15 XP</div>
+      <div class="done-msg">Great job watching the full lesson! Your tracker has been automatically updated. ✓</div>
+      <a class="go-btn" href="tracker.html">← Back to Tracker</a>
+    </div>
+  </div>
+
+  <script>
+    // ── CONFIG ──────────────────────────────────────────
+    const SIGNAL_KEY = 'studytracker_signal';
+    const SIGNAL_ID = 'signal_video';        // must match tracker.html AUTO_TASKS signalId
+    const COMPLETE_PCT = 0.80;                  // 80% watched = done
+    // ────────────────────────────────────────────────────
+
+    const vid = document.getElementById('vid');
+    let maxWatched = 0; // furthest second reached (prevents scrubbing cheat)
+    let signalled = false;
+
+    // If no real video file, simulate a demo duration
+    vid.addEventListener('error', () => {
+      console.warn('No video file found — running in demo mode (simulated 240s video)');
+      setupDemo();
+    });
+
+    // ── VIDEO EVENTS ──────────────────────────────────────
+    vid.addEventListener('loadedmetadata', () => {
+      document.getElementById('dur-time').textContent = fmtTime(vid.duration);
+    });
+
+    vid.addEventListener('timeupdate', () => {
+      if (!vid.duration) return;
+      const curr = vid.currentTime;
+      // Only advance maxWatched forward (no scrubbing exploit)
+      if (curr > maxWatched) maxWatched = curr;
+      const watchedFrac = maxWatched / vid.duration;
+      const currFrac = curr / vid.duration;
+
+      document.getElementById('prog-fill').style.width = (currFrac * 100) + '%';
+      document.getElementById('prog-watched').style.width = (watchedFrac * 100) + '%';
+      document.getElementById('curr-time').textContent = fmtTime(curr);
+
+      // Update ring
+      const offset = 125.6 - watchedFrac * 125.6;
+      document.getElementById('ring-c').style.strokeDashoffset = offset;
+
+      // Banner
+      const pctLabel = Math.round(watchedFrac * 100) + '%';
+      document.getElementById('wb-title').textContent = `Watched: ${pctLabel}`;
+
+      // Check completion
+      if (watchedFrac >= COMPLETE_PCT && !signalled) {
+        fireSignal();
+      }
+    });
+
+    vid.addEventListener('play', () => { document.getElementById('play-btn').textContent = '⏸'; document.getElementById('play-icon').textContent = '⏸'; document.getElementById('play-overlay').classList.add('hidden'); });
+    vid.addEventListener('pause', () => { document.getElementById('play-btn').textContent = '▶'; document.getElementById('play-icon').textContent = '▶'; document.getElementById('play-overlay').classList.remove('hidden'); });
+    vid.addEventListener('ended', () => { if (!signalled) fireSignal(); });
+
+    function togglePlay() {
+      if (vid.paused) vid.play().catch(() => { }); else vid.pause();
+    }
+
+    function seekTo(e) {
+      if (!vid.duration) return;
+      const rect = document.getElementById('prog-wrap').getBoundingClientRect();
+      const frac = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      vid.currentTime = frac * vid.duration;
+    }
+
+    function setVol(v) { vid.volume = v; }
+    function jumpTo(sec) { vid.currentTime = sec; vid.play().catch(() => { }); }
+
+    function fmtTime(s) {
+      if (!s || isNaN(s)) return '0:00';
+      const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+      return `${m}:${String(sec).padStart(2, '0')}`;
+    }
+
+    // ── SIGNAL TO TRACKER ────────────────────────────────
+    function fireSignal() {
+      signalled = true;
+      const today = new Date();
+      const dateKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+      // Write to shared localStorage key
+      let signals = {};
+      try { signals = JSON.parse(localStorage.getItem(SIGNAL_KEY)) || {}; } catch (e) { }
+      signals[SIGNAL_ID] = { date: dateKey, ts: Date.now(), processed: false };
+      localStorage.setItem(SIGNAL_KEY, JSON.stringify(signals));
+
+      // Update banner
+      document.getElementById('wb-status').className = 'wb-status done';
+      document.getElementById('wb-status').textContent = '✓ Done';
+      document.getElementById('wb-title').textContent = '✓ Lesson complete!';
+      document.getElementById('wb-sub').textContent = 'Your tracker has been automatically updated.';
+
+      setTimeout(() => {
+        document.getElementById('done-overlay').classList.add('show');
+      }, 800);
+    }
+
+    // ── DEMO MODE (no real video file) ───────────────────
+    function setupDemo() {
+      // Simulate a 240-second video via a manual ticker
+      let fakeDur = 240, fakeCurr = 0, playing = false;
+      let ticker = null;
+
+      document.getElementById('dur-time').textContent = fmtTime(fakeDur);
+
+      function tick() {
+        if (!playing) return;
+        fakeCurr = Math.min(fakeDur, fakeCurr + 0.5);
+        if (fakeCurr > maxWatched) maxWatched = fakeCurr;
+        const wf = maxWatched / fakeDur;
+        const cf = fakeCurr / fakeDur;
+        document.getElementById('prog-fill').style.width = (cf * 100) + '%';
+        document.getElementById('prog-watched').style.width = (wf * 100) + '%';
+        document.getElementById('curr-time').textContent = fmtTime(fakeCurr);
+        document.getElementById('ring-c').style.strokeDashoffset = 125.6 - wf * 125.6;
+        document.getElementById('wb-title').textContent = `Watched: ${Math.round(wf * 100)}%`;
+        if (wf >= COMPLETE_PCT && !signalled) fireSignal();
+        if (fakeCurr >= fakeDur) { playing = false; clearInterval(ticker); if (!signalled) fireSignal(); }
+      }
+
+      // Override togglePlay
+      window.togglePlay = function () {
+        playing = !playing;
+        if (playing) {
+          document.getElementById('play-btn').textContent = '⏸';
+          document.getElementById('play-icon').textContent = '⏸';
+          document.getElementById('play-overlay').classList.add('hidden');
+          ticker = setInterval(tick, 500);
+        } else {
+          document.getElementById('play-btn').textContent = '▶';
+          document.getElementById('play-icon').textContent = '▶';
+          document.getElementById('play-overlay').classList.remove('hidden');
+          clearInterval(ticker);
+        }
+      };
+      window.seekTo = function (e) {
+        const rect = document.getElementById('prog-wrap').getBoundingClientRect();
+        const frac = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        fakeCurr = frac * fakeDur;
+      };
+      window.jumpTo = function (sec) { fakeCurr = sec; if (!playing) window.togglePlay(); };
+
+      document.querySelector('.wb-sub').textContent = '⚠️ Demo mode (no video file). Replace <video src> with your actual video.';
+    }
+
+/*
+──────────────────────────────────────────────────────────
+HOW TO USE YOUR OWN VIDEO:
+──────────────────────────────────────────────────────────
+1. LOCAL FILE:
+   Replace the <source> tag src:
+   <source src="videos/chapter1.mp4" type="video/mp4">
+
+2. YOUTUBE (embedded):
+   Remove the <video> tag entirely, use YouTube iframe API:
+
+   <div id="yt-player"></div>
+   <script src="https://www.youtube.com/iframe_api"></script>
+  <script>
+   var ytPlayer;
+   function onYouTubeIframeAPIReady() {
+     ytPlayer = new YT.Player('yt-player', {
+       videoId: 'YOUR_VIDEO_ID',
+       events: { onStateChange: onPlayerStateChange }
+     });
+   }
+   function onPlayerStateChange(e) {
+     // YT.PlayerState.PLAYING = 1
+   }
+   // Poll ytPlayer.getCurrentTime() / ytPlayer.getDuration() to track progress
+  <\/script>
+
+  3. Change COMPLETE_PCT at the top to adjust threshold (default 0.80 = 80%)
+  ──────────────────────────────────────────────────────────
+  */
+  </script>
+</body>
+
+</html>

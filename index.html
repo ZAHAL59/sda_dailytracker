@@ -1,0 +1,1433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Study Tracker</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #17171d;
+      --card: #1e1e26;
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #f0eeff;
+      --muted: rgba(240, 238, 255, 0.45);
+      --dim: rgba(240, 238, 255, 0.18);
+      --violet: #7c5cfc;
+      --violet-glow: rgba(124, 92, 252, 0.22);
+      --teal: #00d4aa;
+      --teal-glow: rgba(0, 212, 170, 0.18);
+      --amber: #ffb547;
+      --rose: #ff6b8a;
+      --sky: #38bdf8;
+      --lime: #a3e635;
+      --r: 16px;
+      --r-sm: 10px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: linear-gradient(rgba(124, 92, 252, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(124, 92, 252, 0.025) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 16px 60px;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 0 0;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      background: linear-gradient(135deg, var(--violet), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .date-pill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .streak-pill {
+      background: linear-gradient(135deg, rgba(255, 181, 71, 0.15), rgba(255, 107, 138, 0.1));
+      border: 1px solid rgba(255, 181, 71, 0.3);
+      border-radius: 30px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* NAME BANNER */
+    .name-banner {
+      margin-top: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .name-banner::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: linear-gradient(180deg, var(--violet), var(--teal));
+    }
+
+    .name-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--violet), var(--teal));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .name-info {
+      flex: 1;
+    }
+
+    .name-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .name-display {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .name-edit-input {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid var(--violet);
+      color: var(--text);
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      outline: none;
+      width: 200px;
+    }
+
+    .edit-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 5px 10px;
+      font-size: 0.78rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .edit-btn:hover {
+      border-color: var(--violet);
+      color: var(--violet);
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 4px;
+      margin: 20px 0;
+      width: fit-content;
+    }
+
+    .tab {
+      padding: 8px 20px;
+      border-radius: 26px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--muted);
+      background: transparent;
+    }
+
+    .tab.active {
+      background: var(--violet);
+      color: #fff;
+      box-shadow: 0 2px 12px var(--violet-glow);
+    }
+
+    .tab:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* PANELS */
+    .panel {
+      display: none;
+      animation: fadeUp 0.3s ease;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    /* SUMMARY ROW */
+    .summary-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .sum-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sum-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .sum-card.v1::after {
+      background: var(--violet);
+    }
+
+    .sum-card.v2::after {
+      background: var(--teal);
+    }
+
+    .sum-card.v3::after {
+      background: var(--amber);
+    }
+
+    .sum-icon {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+
+    .sum-val {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.6rem;
+      line-height: 1;
+    }
+
+    .sum-card.v1 .sum-val {
+      color: var(--violet);
+    }
+
+    .sum-card.v2 .sum-val {
+      color: var(--teal);
+    }
+
+    .sum-card.v3 .sum-val {
+      color: var(--amber);
+    }
+
+    .sum-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* PROGRESS HEADER */
+    .daily-header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px 22px;
+      margin-bottom: 20px;
+    }
+
+    .ring-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .ring-svg {
+      transform: rotate(-90deg);
+    }
+
+    .ring-track {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.07);
+      stroke-width: 8;
+    }
+
+    .ring-fill {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke: url(#ringGrad);
+      stroke-dasharray: 220;
+      stroke-dashoffset: 220;
+      transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ring-pct {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--text);
+    }
+
+    .ring-sub {
+      font-size: 0.6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .daily-header-text h2 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .daily-header-text p {
+      font-size: 0.86rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .motivate {
+      display: inline-block;
+      margin-top: 8px;
+      background: linear-gradient(135deg, var(--violet-glow), var(--teal-glow));
+      border: 1px solid rgba(124, 92, 252, 0.25);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.78rem;
+      color: var(--violet);
+      font-weight: 600;
+    }
+
+    /* SECTION TITLE */
+    .section-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin: 22px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stag {
+      background: var(--violet);
+      color: #fff;
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+
+    .stag-auto {
+      background: linear-gradient(135deg, var(--teal), #00a882);
+      color: #000;
+      border-radius: 20px;
+      padding: 2px 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+    }
+
+    /* TASK GRID */
+    .tasks-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .task-item {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .task-item.manual {
+      cursor: pointer;
+    }
+
+    .task-item.manual:hover {
+      border-color: rgba(124, 92, 252, 0.3);
+    }
+
+    .task-item.done {
+      border-color: rgba(0, 212, 170, 0.3);
+      background: rgba(0, 212, 170, 0.04);
+    }
+
+    .task-item.done::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--teal);
+    }
+
+    .task-item.auto-task {
+      cursor: default;
+    }
+
+    .task-item.auto-task:not(.done) {
+      opacity: 0.85;
+    }
+
+    .task-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .task-item.done .task-check {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: #000;
+    }
+
+    .task-icon {
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .task-body {
+      flex: 1;
+    }
+
+    .task-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .task-item.done .task-name {
+      color: var(--muted);
+    }
+
+    .task-sub {
+      font-size: 0.76rem;
+      color: var(--dim);
+      margin-top: 1px;
+    }
+
+    .task-pts {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--amber);
+      background: rgba(255, 181, 71, 0.12);
+      border-radius: 20px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+    }
+
+    /* Auto badge */
+    .auto-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: rgba(0, 212, 170, 0.12);
+      color: var(--teal);
+      border: 1px solid rgba(0, 212, 170, 0.25);
+      border-radius: 20px;
+      padding: 2px 7px;
+      margin-top: 3px;
+      display: inline-block;
+    }
+
+    /* LINK BUTTON */
+    .open-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(124, 92, 252, 0.12);
+      border: 1px solid rgba(124, 92, 252, 0.3);
+      border-radius: 8px;
+      color: var(--violet);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      margin-top: 4px;
+    }
+
+    .open-btn:hover {
+      background: rgba(124, 92, 252, 0.22);
+    }
+
+    /* CUSTOM ADD */
+    .add-task-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .add-task-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 10px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .add-task-input:focus {
+      border-color: var(--violet);
+    }
+
+    .add-task-input::placeholder {
+      color: var(--dim);
+    }
+
+    .add-btn {
+      background: var(--violet);
+      border: none;
+      border-radius: var(--r-sm);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      padding: 10px 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .add-btn:hover {
+      filter: brightness(1.15);
+      transform: translateY(-1px);
+    }
+
+    /* WEEKLY */
+    .week-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .week-nav-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 7px 12px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+
+    .week-nav-btn:hover {
+      border-color: var(--violet);
+      color: var(--violet);
+    }
+
+    .week-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      flex: 1;
+      text-align: center;
+    }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .week-day {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 10px 8px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .week-day.today {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 1px var(--violet);
+    }
+
+    .week-day.has-data {
+      border-color: rgba(0, 212, 170, 0.3);
+    }
+
+    .wd-name {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 5px;
+    }
+
+    .wd-date {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .wd-dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      justify-content: center;
+      min-height: 16px;
+    }
+
+    .wd-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    .wd-pct {
+      font-size: 0.7rem;
+      color: var(--teal);
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .week-detail {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .week-detail-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px;
+    }
+
+    .week-detail-card h3 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+    }
+
+    .wk-task-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .wk-task-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      min-width: 100px;
+    }
+
+    .wk-task-bar-wrap {
+      flex: 1;
+    }
+
+    .wk-task-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .wk-task-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+
+    .wk-task-count {
+      font-size: 0.76rem;
+      color: var(--muted);
+      font-weight: 700;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 18px;
+      border-radius: var(--r-sm);
+      font-weight: 600;
+      font-size: 0.85rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      z-index: 9999;
+      pointer-events: none;
+      border: 1px solid rgba(0, 212, 170, 0.3);
+      background: rgba(0, 212, 170, 0.12);
+      color: var(--teal);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast.bad {
+      background: rgba(255, 107, 138, 0.12);
+      color: var(--rose);
+      border-color: rgba(255, 107, 138, 0.3);
+    }
+
+    .toast.info {
+      background: rgba(124, 92, 252, 0.12);
+      color: var(--violet);
+      border-color: rgba(124, 92, 252, 0.3);
+    }
+
+    /* CONFETTI */
+    .confetti-piece {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 9998;
+      animation: confettiFall var(--dur, 1s) ease forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(var(--sy)) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(calc(var(--sy) + 600px)) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* AUTO-CHECK PULSE */
+    @keyframes autoPulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(0, 212, 170, 0.5);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(0, 212, 170, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(0, 212, 170, 0);
+      }
+    }
+
+    .task-item.just-autochecked {
+      animation: autoPulse 0.7s ease;
+    }
+
+    @media(max-width:650px) {
+      .summary-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .tasks-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .week-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .week-detail {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="logo">📚 StudyTrack</div>
+      <div class="topbar-right">
+        <div class="date-pill" id="date-pill"></div>
+        <div class="streak-pill">🔥 <span id="streak-count">0</span> day streak</div>
+      </div>
+    </div>
+
+    <!-- NAME BANNER -->
+    <div class="name-banner">
+      <div class="name-avatar" id="name-avatar">S</div>
+      <div class="name-info">
+        <div class="name-label">Student</div>
+        <div class="name-display" id="name-display-wrap">
+          <span id="name-display">Student</span>
+          <button class="edit-btn" onclick="editName()">✏️ Edit</button>
+        </div>
+        <div id="name-edit-wrap" style="display:none;margin-top:4px;">
+          <input class="name-edit-input" id="name-input" placeholder="Enter your name…"
+            onkeydown="if(event.key==='Enter')saveName()">
+          <button class="edit-btn" style="margin-left:8px;border-color:var(--teal);color:var(--teal)"
+            onclick="saveName()">Save</button>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.4rem;color:var(--violet)"
+          id="xp-display">0 XP</div>
+        <div style="font-size:0.72rem;color:var(--muted)">Total XP Earned</div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('daily',this)">📋 Today</button>
+      <button class="tab" onclick="showTab('weekly',this)">📅 Weekly</button>
+    </div>
+
+    <!-- ══ DAILY PANEL ══ -->
+    <div class="panel active" id="panel-daily">
+      <div class="summary-row">
+        <div class="sum-card v1">
+          <div class="sum-icon">✅</div>
+          <div class="sum-val" id="sum-done">0</div>
+          <div class="sum-label">Completed</div>
+        </div>
+        <div class="sum-card v2">
+          <div class="sum-icon">🎯</div>
+          <div class="sum-val" id="sum-total">0</div>
+          <div class="sum-label">Total Tasks</div>
+        </div>
+        <div class="sum-card v3">
+          <div class="sum-icon">⭐</div>
+          <div class="sum-val" id="sum-xp">0</div>
+          <div class="sum-label">XP Today</div>
+        </div>
+      </div>
+      <div class="daily-header">
+        <div class="ring-wrap">
+          <svg class="ring-svg" width="90" height="90" viewBox="0 0 90 90">
+            <defs>
+              <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:var(--violet)" />
+                <stop offset="100%" style="stop-color:var(--teal)" />
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="45" cy="45" r="35" />
+            <circle class="ring-fill" id="ring-fill" cx="45" cy="45" r="35" />
+          </svg>
+          <div class="ring-center">
+            <div class="ring-pct" id="ring-pct">0%</div>
+            <div class="ring-sub">done</div>
+          </div>
+        </div>
+        <div class="daily-header-text">
+          <h2 id="daily-greeting">Good morning! 👋</h2>
+          <p id="daily-sub">Complete your tasks to keep your streak going.</p>
+          <div class="motivate" id="motivate-msg">🚀 Let's get started!</div>
+        </div>
+      </div>
+
+      <!-- AUTO tasks -->
+      <div class="section-title">Auto-Tracked Activities <span class="stag-auto">✦ Auto</span></div>
+      <div class="tasks-grid" id="auto-tasks"></div>
+
+      <!-- MANUAL tasks -->
+      <div class="section-title" style="margin-top:20px;">Self-Check Activities <span class="stag">Manual</span></div>
+      <div class="tasks-grid" id="manual-tasks"></div>
+
+      <!-- CUSTOM tasks -->
+      <div class="section-title" style="margin-top:20px;">Custom Tasks <span class="stag">Optional</span></div>
+      <div class="tasks-grid" id="custom-tasks-list"></div>
+      <div class="add-task-row">
+        <input class="add-task-input" id="custom-task-input" placeholder="➕ Add a custom task for today…"
+          onkeydown="if(event.key==='Enter')addCustomTask()">
+        <button class="add-btn" onclick="addCustomTask()">Add</button>
+      </div>
+    </div>
+
+    <!-- ══ WEEKLY PANEL ══ -->
+    <div class="panel" id="panel-weekly">
+      <div class="week-nav">
+        <button class="week-nav-btn" onclick="changeWeek(-1)">← Prev</button>
+        <div class="week-title" id="week-title"></div>
+        <button class="week-nav-btn" onclick="changeWeek(1)">Next →</button>
+      </div>
+      <div class="week-grid" id="week-grid"></div>
+      <div class="week-detail">
+        <div class="week-detail-card">
+          <h3>📋 Task Completion This Week</h3>
+          <div id="wk-task-bars"></div>
+        </div>
+        <div class="week-detail-card">
+          <h3>⭐ XP Earned Per Day</h3>
+          <div id="wk-xp-list"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ═══════════════════════════════════════════════════
+    // CONSTANTS
+    // ═══════════════════════════════════════════════════
+    const KEY = 'studytracker_v4';
+    const SIGNAL_KEY = 'studytracker_signal'; // content pages write here
+
+    // AUTO tasks: completed automatically when student uses content pages
+    // Each has a "signalId" that content pages write to localStorage
+    const AUTO_TASKS = [
+      { id: 'video', icon: '🎬', name: 'Watched Video', sub: 'Auto-checked when video is completed', xp: 15, signalId: 'signal_video', link: 'video_lesson.html', linkLabel: 'Open Video' },
+      { id: 'mocktest', icon: '🎯', name: 'Mock Test', sub: 'Auto-checked when test is submitted', xp: 25, signalId: 'signal_mocktest', link: 'mock_test.html', linkLabel: 'Take Test' },
+      { id: 'assignment', icon: '📚', name: 'Assignment', sub: 'Auto-checked when assignment is submitted', xp: 20, signalId: 'signal_assignment', link: 'assignment.html', linkLabel: 'Open Assignment' },
+      { id: 'practice', icon: '✏️', name: 'Practice Problems', sub: 'Auto-checked when problem set is done', xp: 15, signalId: 'signal_practice', link: 'practice_problems.html', linkLabel: 'Start Practice' },
+    ];
+
+    // MANUAL tasks: student checks themselves
+    const MANUAL_TASKS = [
+      { id: 'notes', icon: '📝', name: 'Notes Read', sub: 'Tap when you finish reading your notes', xp: 10 },
+      { id: 'revision', icon: '🔁', name: 'Revision Done', sub: 'Tap when you finish revising a topic', xp: 10 },
+      { id: 'reading', icon: '📖', name: 'Textbook Read', sub: 'Tap when you finish the chapter reading', xp: 10 },
+      { id: 'doubt', icon: '💬', name: 'Doubts Cleared', sub: 'Tap after clearing your doubts with teacher', xp: 10 },
+    ];
+
+    const TASK_COLORS = ['#7c5cfc', '#00d4aa', '#ffb547', '#ff6b8a', '#38bdf8', '#a3e635', '#fb923c', '#e879f9'];
+    const ALL_TASKS = [...AUTO_TASKS, ...MANUAL_TASKS];
+
+    // ═══════════════════════════════════════════════════
+    // DATA
+    // ═══════════════════════════════════════════════════
+    function loadData() {
+      try { return JSON.parse(localStorage.getItem(KEY)) || defaultData(); }
+      catch { return defaultData(); }
+    }
+    function saveData(d) { localStorage.setItem(KEY, JSON.stringify(d)); }
+    function defaultData() {
+      return { name: '', xpTotal: 0, streak: 0, lastActiveDate: '', days: {} };
+    }
+
+    let DATA = loadData();
+    let weekOffset = 0;
+
+    function todayKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+    function dateKey(d) {
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+    function todayData() {
+      const k = todayKey();
+      if (!DATA.days[k]) DATA.days[k] = { tasks: {}, customTasks: [], xp: 0 };
+      if (!DATA.days[k].xp) DATA.days[k].xp = 0;
+      return DATA.days[k];
+    }
+    function pct(a, b) { return b === 0 ? 0 : Math.round(a / b * 100); }
+
+    // ═══════════════════════════════════════════════════
+    // SIGNAL POLLING — checks if content pages fired auto-checks
+    // ═══════════════════════════════════════════════════
+    function pollSignals() {
+      try {
+        const raw = localStorage.getItem(SIGNAL_KEY);
+        if (!raw) return;
+        const signals = JSON.parse(raw);
+        const today = todayKey();
+        let changed = false;
+
+        AUTO_TASKS.forEach(t => {
+          const sig = signals[t.signalId];
+          if (sig && sig.date === today && !sig.processed) {
+            // Mark the task done
+            const day = todayData();
+            if (!day.tasks[t.id]) {
+              day.tasks[t.id] = true;
+              DATA.xpTotal = (DATA.xpTotal || 0) + t.xp;
+              day.xp = (day.xp || 0) + t.xp;
+              changed = true;
+              // Mark signal as processed
+              signals[t.signalId].processed = true;
+              localStorage.setItem(SIGNAL_KEY, JSON.stringify(signals));
+              saveData(DATA);
+              // Show auto-check UI
+              showAutoCheck(t);
+            }
+          }
+        });
+        if (changed) renderDaily();
+      } catch (e) { }
+    }
+
+    function showAutoCheck(task) {
+      toast(`✦ Auto-checked: ${task.name} — +${task.xp} XP!`, 'auto');
+      // Pulse animation on that card
+      setTimeout(() => {
+        const el = document.getElementById('auto-' + task.id);
+        if (el) {
+          el.classList.add('just-autochecked');
+          setTimeout(() => el.classList.remove('just-autochecked'), 800);
+        }
+      }, 100);
+    }
+
+    // Poll every 2 seconds while page is open
+    setInterval(pollSignals, 2000);
+
+    // Also listen for storage events (same browser, different tab)
+    window.addEventListener('storage', e => {
+      if (e.key === SIGNAL_KEY) pollSignals();
+    });
+
+    // ═══════════════════════════════════════════════════
+    // NAME
+    // ═══════════════════════════════════════════════════
+    function renderName() {
+      const n = DATA.name || 'Student';
+      document.getElementById('name-display').textContent = n;
+      document.getElementById('name-avatar').textContent = n.charAt(0).toUpperCase();
+      document.getElementById('xp-display').textContent = DATA.xpTotal + ' XP';
+    }
+    function editName() {
+      document.getElementById('name-display').parentElement.style.display = 'none';
+      document.getElementById('name-edit-wrap').style.display = 'flex';
+      const inp = document.getElementById('name-input');
+      inp.value = DATA.name; inp.focus();
+    }
+    function saveName() {
+      const v = document.getElementById('name-input').value.trim();
+      if (v) DATA.name = v;
+      saveData(DATA); renderName();
+      document.getElementById('name-display').parentElement.style.display = 'flex';
+      document.getElementById('name-edit-wrap').style.display = 'none';
+    }
+
+    // ═══════════════════════════════════════════════════
+    // STREAK
+    // ═══════════════════════════════════════════════════
+    function updateStreak() {
+      const today = todayKey();
+      if (DATA.lastActiveDate !== today) {
+        const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
+        const yKey = dateKey(yesterday);
+        DATA.streak = DATA.lastActiveDate === yKey ? (DATA.streak || 0) + 1 : 1;
+        DATA.lastActiveDate = today;
+        saveData(DATA);
+      }
+      document.getElementById('streak-count').textContent = DATA.streak || 1;
+    }
+
+    // ═══════════════════════════════════════════════════
+    // TABS
+    // ═══════════════════════════════════════════════════
+    function showTab(name, btn) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      btn.classList.add('active');
+      if (name === 'weekly') renderWeekly();
+    }
+
+    // ═══════════════════════════════════════════════════
+    // DAILY RENDER
+    // ═══════════════════════════════════════════════════
+    function renderDaily() {
+      const day = todayData();
+      renderAutoTasks(day);
+      renderManualTasks(day);
+      renderCustomTasks(day);
+      updateDailyStats(day);
+    }
+
+    function renderAutoTasks(day) {
+      const container = document.getElementById('auto-tasks');
+      container.innerHTML = '';
+      AUTO_TASKS.forEach((t, i) => {
+        const done = !!day.tasks[t.id];
+        const div = document.createElement('div');
+        div.className = 'task-item auto-task' + (done ? ' done' : '');
+        div.id = 'auto-' + t.id;
+        div.innerHTML = `
+      <div class="task-check" style="${done ? '' : 'border-color:' + TASK_COLORS[i]}">${done ? '✓' : ''}</div>
+      <div class="task-icon">${t.icon}</div>
+      <div class="task-body">
+        <div class="task-name">${t.name}</div>
+        <div class="task-sub">${t.sub}</div>
+        <div>
+          <span class="auto-badge">✦ auto-tracked</span>
+          <a class="open-btn" href="${t.link}" target="_blank">↗ ${t.linkLabel}</a>
+        </div>
+      </div>
+      <div class="task-pts">+${t.xp} XP</div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function renderManualTasks(day) {
+      const container = document.getElementById('manual-tasks');
+      container.innerHTML = '';
+      MANUAL_TASKS.forEach((t, i) => {
+        const done = !!day.tasks[t.id];
+        const div = document.createElement('div');
+        div.className = 'task-item manual' + (done ? ' done' : '');
+        div.onclick = () => toggleManual(t.id, t.xp, t.name);
+        div.innerHTML = `
+      <div class="task-check" style="${done ? '' : 'border-color:' + TASK_COLORS[(i + 4) % TASK_COLORS.length]}">${done ? '✓' : ''}</div>
+      <div class="task-icon">${t.icon}</div>
+      <div class="task-body">
+        <div class="task-name">${t.name}</div>
+        <div class="task-sub">${t.sub}</div>
+      </div>
+      <div class="task-pts">+${t.xp} XP</div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function renderCustomTasks(day) {
+      const container = document.getElementById('custom-tasks-list');
+      container.innerHTML = '';
+      (day.customTasks || []).forEach((ct, i) => {
+        const div = document.createElement('div');
+        div.className = 'task-item manual' + (ct.done ? ' done' : '');
+        div.onclick = () => toggleCustom(i);
+        div.innerHTML = `
+      <div class="task-check" style="${ct.done ? '' : 'border-color:#fb923c'}">${ct.done ? '✓' : ''}</div>
+      <div class="task-icon">📌</div>
+      <div class="task-body"><div class="task-name">${ct.name}</div><div class="task-sub">Custom task · tap to check</div></div>
+      <div class="task-pts">+5 XP</div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function updateDailyStats(day) {
+      day = day || todayData();
+      const allTasks = [...AUTO_TASKS, ...MANUAL_TASKS];
+      const coreDone = allTasks.filter(t => day.tasks[t.id]).length;
+      const custDone = (day.customTasks || []).filter(c => c.done).length;
+      const totalDone = coreDone + custDone;
+      const total = allTasks.length + (day.customTasks || []).length;
+      const percentage = pct(totalDone, total);
+      const xpToday = allTasks.filter(t => day.tasks[t.id]).reduce((s, t) => s + t.xp, 0) + custDone * 5;
+
+      document.getElementById('sum-done').textContent = totalDone;
+      document.getElementById('sum-total').textContent = total;
+      document.getElementById('sum-xp').textContent = xpToday;
+      document.getElementById('ring-pct').textContent = percentage + '%';
+
+      const circ = 2 * Math.PI * 35;
+      document.getElementById('ring-fill').style.strokeDasharray = circ;
+      document.getElementById('ring-fill').style.strokeDashoffset = circ - (percentage / 100) * circ;
+
+      const h = new Date().getHours();
+      const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+      const nm = DATA.name ? ', ' + DATA.name.split(' ')[0] : '';
+      document.getElementById('daily-greeting').textContent = g + nm + '! 👋';
+      document.getElementById('daily-sub').textContent = `${totalDone} of ${total} tasks completed today.`;
+      document.getElementById('motivate-msg').textContent =
+        percentage === 0 ? '🚀 Let\'s get started!' :
+          percentage < 30 ? '📖 Warming up — keep going!' :
+            percentage < 60 ? '💪 Great momentum!' :
+              percentage < 100 ? '🔥 Almost there — crushing it!' :
+                '🌟 Perfect day! All tasks done!';
+
+      if (percentage === 100) showConfetti();
+    }
+
+    // ═══════════════════════════════════════════════════
+    // TOGGLE
+    // ═══════════════════════════════════════════════════
+    function toggleManual(id, xp, name) {
+      const day = todayData();
+      const was = !!day.tasks[id];
+      day.tasks[id] = !was;
+      if (!was) { DATA.xpTotal = (DATA.xpTotal || 0) + xp; day.xp = (day.xp || 0) + xp; toast(`✓ ${name} — +${xp} XP!`); }
+      else { DATA.xpTotal = Math.max(0, (DATA.xpTotal || 0) - xp); day.xp = Math.max(0, (day.xp || 0) - xp); }
+      saveData(DATA); renderDaily(); renderName();
+    }
+
+    function toggleCustom(i) {
+      const day = todayData();
+      const ct = day.customTasks[i];
+      ct.done = !ct.done;
+      if (ct.done) { DATA.xpTotal = (DATA.xpTotal || 0) + 5; day.xp = (day.xp || 0) + 5; toast(`✓ ${ct.name} — +5 XP!`); }
+      else { DATA.xpTotal = Math.max(0, (DATA.xpTotal || 0) - 5); day.xp = Math.max(0, (day.xp || 0) - 5); }
+      saveData(DATA); renderCustomTasks(day); updateDailyStats(day); renderName();
+    }
+
+    function addCustomTask() {
+      const inp = document.getElementById('custom-task-input');
+      const name = inp.value.trim();
+      if (!name) return;
+      const day = todayData();
+      day.customTasks = day.customTasks || [];
+      day.customTasks.push({ name, done: false });
+      saveData(DATA); inp.value = '';
+      renderCustomTasks(day); updateDailyStats(day);
+      toast('Task added!', 'info');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // WEEKLY
+    // ═══════════════════════════════════════════════════
+    function getWeekDays(offset) {
+      const today = new Date();
+      const start = new Date(today);
+      start.setDate(today.getDate() - today.getDay() + 1 + offset * 7);
+      return Array.from({ length: 7 }, (_, i) => { const d = new Date(start); d.setDate(start.getDate() + i); return d; });
+    }
+    function changeWeek(dir) { weekOffset += dir; renderWeekly(); }
+
+    function renderWeekly() {
+      const days = getWeekDays(weekOffset);
+      const todayStr = todayKey();
+      const fmt = d => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+      document.getElementById('week-title').textContent = `${fmt(days[0])} – ${fmt(days[6])}`;
+
+      const grid = document.getElementById('week-grid');
+      const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      grid.innerHTML = '';
+
+      const taskTotals = {};
+      ALL_TASKS.forEach(t => taskTotals[t.id] = 0);
+
+      days.forEach((d, i) => {
+        const k = dateKey(d);
+        const dayData = DATA.days[k];
+        const isToday = k === todayStr;
+        const isFuture = k > todayStr;
+        let dots = '', pctStr = '', hasData = false;
+
+        if (dayData && !isFuture) {
+          hasData = true;
+          ALL_TASKS.forEach((t, ti) => {
+            if (dayData.tasks && dayData.tasks[t.id]) {
+              taskTotals[t.id]++;
+              dots += `<div class="wd-dot" style="background:${TASK_COLORS[ti % TASK_COLORS.length]}"></div>`;
+            }
+          });
+          const done = Object.values(dayData.tasks || {}).filter(Boolean).length;
+          const custDone = (dayData.customTasks || []).filter(c => c.done).length;
+          const total = ALL_TASKS.length + (dayData.customTasks || []).length;
+          const p = pct(done + custDone, total);
+          pctStr = p > 0 ? p + '%' : '';
+        }
+
+        const div = document.createElement('div');
+        div.className = 'week-day' + (isToday ? ' today' : '') + (hasData ? ' has-data' : '');
+        div.innerHTML = `
+      <div class="wd-name">${dayNames[i]}</div>
+      <div class="wd-date" style="color:${isToday ? 'var(--violet)' : 'var(--text)'}">${d.getDate()}</div>
+      <div class="wd-dots">${dots || (isFuture ? '' : '<div style="font-size:0.65rem;color:var(--dim)">—</div>')}</div>
+      <div class="wd-pct">${pctStr}</div>`;
+        grid.appendChild(div);
+      });
+
+      // Task bars
+      document.getElementById('wk-task-bars').innerHTML = ALL_TASKS.map((t, i) => {
+        const done = taskTotals[t.id];
+        const p = pct(done, 7);
+        return `<div class="wk-task-row">
+      <div class="wk-task-label">${t.icon} ${t.name}</div>
+      <div class="wk-task-bar-wrap"><div class="wk-task-bar"><div class="wk-task-fill" style="width:${p}%;background:${TASK_COLORS[i % TASK_COLORS.length]}"></div></div></div>
+      <div class="wk-task-count">${done}/7</div>
+    </div>`;
+      }).join('');
+
+      // XP per day
+      document.getElementById('wk-xp-list').innerHTML = days.map((d, i) => {
+        const k = dateKey(d);
+        const xp = (DATA.days[k] || {}).xp || 0;
+        const isT = k === todayStr;
+        return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div style="font-size:0.8rem;font-weight:600;min-width:32px;color:${isT ? 'var(--violet)' : 'var(--muted)'}">${dayNames[i]}</div>
+      <div style="flex:1;height:8px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;">
+        <div style="height:100%;width:${Math.min(100, xp / 1.2)}%;background:linear-gradient(90deg,var(--violet),var(--amber));border-radius:99px;transition:width 0.5s"></div>
+      </div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:0.82rem;color:${xp > 0 ? 'var(--amber)' : 'var(--dim)'};min-width:50px;text-align:right">${xp > 0 ? xp + ' XP' : '—'}</div>
+    </div>`;
+      }).join('');
+    }
+
+    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+    // ═══════════════════════════════════════════════════
+    // UI UTILS
+    // ═══════════════════════════════════════════════════
+    function toast(msg, type = '') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' ' + type : '');
+      clearTimeout(t._t);
+      t._t = setTimeout(() => t.classList.remove('show'), 3200);
+    }
+
+    function showConfetti() {
+      const colors = ['#7c5cfc', '#00d4aa', '#ffb547', '#ff6b8a', '#38bdf8', '#a3e635'];
+      for (let i = 0; i < 50; i++) {
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.cssText = `left:${Math.random() * 100}vw;background:${colors[Math.floor(Math.random() * colors.length)]};--sy:${-50 - Math.random() * 50}px;--dur:${0.8 + Math.random() * 1.2}s;animation-delay:${Math.random() * 0.5}s;`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+      }
+    }
+
+    function setDatePill() {
+      document.getElementById('date-pill').textContent = new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    // ═══════════════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════════════
+    function init() {
+      setDatePill(); updateStreak(); renderName();
+      pollSignals(); // check on load
+      renderDaily();
+      if (!DATA.name) setTimeout(() => { editName(); toast('👋 Enter your name to get started!', 'info'); }, 600);
+    }
+    init();
+  </script>
+</body>
+
+</html>

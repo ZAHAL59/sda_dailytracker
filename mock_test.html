@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mock Test</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --card: #1e1e26;
+      --border: rgba(255, 255, 255, 0.07);
+      --text: #f0eeff;
+      --muted: rgba(240, 238, 255, 0.45);
+      --dim: rgba(240, 238, 255, 0.18);
+      --violet: #7c5cfc;
+      --teal: #00d4aa;
+      --amber: #ffb547;
+      --rose: #ff6b8a;
+      --green: #22c55e;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 8px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      color: var(--text);
+    }
+
+    .test-header {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .test-meta {
+      flex: 1;
+    }
+
+    .test-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--violet);
+      margin-bottom: 5px;
+    }
+
+    .test-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+
+    .test-info {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .timer-box {
+      background: rgba(124, 92, 252, 0.1);
+      border: 1px solid rgba(124, 92, 252, 0.25);
+      border-radius: 12px;
+      padding: 10px 18px;
+      text-align: center;
+    }
+
+    .timer-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .timer-val {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: var(--violet);
+    }
+
+    .timer-val.warn {
+      color: var(--rose);
+    }
+
+    /* Progress */
+    .test-prog-bar {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 99px;
+      height: 6px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .test-prog-fill {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--violet), var(--teal));
+      transition: width 0.4s ease;
+    }
+
+    /* Question */
+    .q-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .q-card.answered {
+      border-color: rgba(0, 212, 170, 0.25);
+    }
+
+    .q-num {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--violet);
+      margin-bottom: 8px;
+    }
+
+    .q-text {
+      font-weight: 600;
+      font-size: 0.98rem;
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .opt-btn {
+      background: rgba(255, 255, 255, 0.04);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      text-align: left;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .opt-btn:hover:not(.sel):not(.disabled) {
+      border-color: rgba(124, 92, 252, 0.4);
+      background: rgba(124, 92, 252, 0.07);
+    }
+
+    .opt-btn.sel {
+      border-color: var(--violet);
+      background: rgba(124, 92, 252, 0.15);
+      color: #fff;
+    }
+
+    .opt-btn.correct {
+      border-color: var(--teal);
+      background: rgba(0, 212, 170, 0.12);
+      color: var(--teal);
+    }
+
+    .opt-btn.wrong {
+      border-color: var(--rose);
+      background: rgba(255, 107, 138, 0.1);
+      color: var(--rose);
+    }
+
+    .opt-btn.disabled {
+      cursor: default;
+    }
+
+    .opt-label {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      min-width: 20px;
+      color: var(--muted);
+    }
+
+    .q-exp {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(255, 181, 71, 0.08);
+      border-left: 3px solid var(--amber);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.84rem;
+      color: #c9963a;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .q-exp.show {
+      display: block;
+    }
+
+    /* Nav */
+    .q-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .q-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--muted);
+    }
+
+    .q-dot.active {
+      border-color: var(--violet);
+      color: var(--violet);
+      background: rgba(124, 92, 252, 0.1);
+    }
+
+    .q-dot.answered {
+      border-color: rgba(0, 212, 170, 0.4);
+      background: rgba(0, 212, 170, 0.08);
+      color: var(--teal);
+    }
+
+    /* Bottom bar */
+    .bottom-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 14px 0;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .prev-btn,
+    .next-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .prev-btn:hover,
+    .next-btn:hover {
+      border-color: var(--violet);
+      color: var(--violet);
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, var(--violet), #5b3fcf);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 24px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-left: auto;
+    }
+
+    .submit-btn:hover {
+      filter: brightness(1.12);
+    }
+
+    .answered-count {
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* Result overlay */
+    .result-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-overlay.show {
+      display: flex;
+    }
+
+    .result-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popIn {
+      from {
+        transform: scale(0.8);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .res-icon {
+      font-size: 4rem;
+      margin-bottom: 12px;
+    }
+
+    .res-title {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      margin-bottom: 6px;
+    }
+
+    .res-score {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 3rem;
+      margin: 10px 0;
+    }
+
+    .res-breakdown {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .res-stat {
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .res-stat-val {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+    }
+
+    .res-stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .xp-badge {
+      background: rgba(255, 181, 71, 0.12);
+      border: 1px solid rgba(255, 181, 71, 0.3);
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--amber);
+      margin-bottom: 18px;
+    }
+
+    .res-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .res-btn {
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .res-btn-primary {
+      background: var(--violet);
+      color: #fff;
+      border: none;
+    }
+
+    .res-btn-secondary {
+      background: transparent;
+      color: var(--muted);
+      border: 1.5px solid var(--border);
+    }
+
+    @media(max-width:500px) {
+      .options {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <a class="back-btn" href="tracker.html">← Back to Tracker</a>
+
+    <div class="test-header">
+      <div class="test-meta">
+        <div class="test-tag">🎯 Mock Test · Chapter 1</div>
+        <div class="test-title">The Wonderful World of Science</div>
+        <div class="test-info" id="test-info">10 Questions · 20 Minutes</div>
+      </div>
+      <div class="timer-box">
+        <div class="timer-label">Time Left</div>
+        <div class="timer-val" id="timer-val">20:00</div>
+      </div>
+    </div>
+
+    <div class="q-nav" id="q-nav"></div>
+    <div class="test-prog-bar">
+      <div class="test-prog-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+    <div id="q-area"></div>
+
+    <div class="bottom-bar">
+      <button class="prev-btn" onclick="navigate(-1)">← Prev</button>
+      <span class="answered-count" id="ans-count">0 / 10 answered</span>
+      <button class="next-btn" onclick="navigate(1)">Next →</button>
+      <button class="submit-btn" onclick="submitTest()">Submit Test ✓</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="result-overlay" id="result-overlay">
+    <div class="result-box">
+      <div class="res-icon" id="res-icon">🎯</div>
+      <div class="res-title" id="res-title">Test Complete!</div>
+      <div class="res-score" id="res-score"></div>
+      <div class="xp-badge">+25 XP Earned! ⭐</div>
+      <div class="res-breakdown">
+        <div class="res-stat">
+          <div class="res-stat-val" id="r-correct" style="color:var(--teal)">0</div>
+          <div class="res-stat-label">Correct</div>
+        </div>
+        <div class="res-stat">
+          <div class="res-stat-val" id="r-wrong" style="color:var(--rose)">0</div>
+          <div class="res-stat-label">Wrong</div>
+        </div>
+        <div class="res-stat">
+          <div class="res-stat-val" id="r-skipped" style="color:var(--amber)">0</div>
+          <div class="res-stat-label">Skipped</div>
+        </div>
+        <div class="res-stat">
+          <div class="res-stat-val" id="r-pct" style="color:var(--violet)">0%</div>
+          <div class="res-stat-label">Score</div>
+        </div>
+      </div>
+      <div class="res-btns">
+        <a class="res-btn res-btn-primary" href="tracker.html">← Back to Tracker</a>
+        <button class="res-btn res-btn-secondary" onclick="reviewMode()">Review Answers</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── CONFIG ──────────────────────────────────────────
+    const SIGNAL_KEY = 'studytracker_signal';
+    const SIGNAL_ID = 'signal_mocktest';
+    const TEST_MINS = 20;
+    // ────────────────────────────────────────────────────
+
+    // ── QUESTIONS ──────────────────────────────────────
+    // 🔧 REPLACE or ADD your own questions here!
+    const QUESTIONS = [
+      { q: 'What is the first step of the Scientific Method?', opts: ['Hypothesis', 'Observation', 'Experiment', 'Conclusion'], ans: 1, exp: 'Observation is always the first step — we notice something interesting and start asking why.' },
+      { q: 'Which of these is a branch of Natural Science?', opts: ['History', 'Geography', 'Physics', 'Economics'], ans: 2, exp: 'Physics is a natural science. History and Economics are social sciences; Geography has elements of both.' },
+      { q: 'A hypothesis is best described as:', opts: ['A proven fact', 'A final result', 'An educated testable guess', 'A random idea'], ans: 2, exp: 'A hypothesis is an educated guess — a prediction you can test with an experiment.' },
+      { q: 'Which instrument is used to observe very tiny objects?', opts: ['Telescope', 'Microscope', 'Barometer', 'Thermometer'], ans: 1, exp: 'A microscope magnifies tiny objects like cells, bacteria and microorganisms.' },
+      { q: 'What is the purpose of a "controlled experiment"?', opts: ['To change all variables at once', 'To change one variable at a time', 'To avoid using any tools', 'To skip the hypothesis'], ans: 1, exp: 'In a controlled experiment, only one variable is changed at a time so we can identify what caused the result.' },
+      { q: 'Which of these represents an OBSERVATION?', opts: ['I think it will rain tomorrow', 'The sky is dark grey today', 'Rain is caused by clouds', 'Weather is unpredictable'], ans: 1, exp: 'An observation is what you directly notice using your senses. "The sky is dark grey" is seen directly.' },
+      { q: 'The conclusion of an experiment must be based on:', opts: ['The teacher\'s opinion', 'Random guessing', 'The collected data and evidence', 'What the hypothesis said'], ans: 2, exp: 'Conclusions must always be based on actual data and evidence, not opinions or expectations.' },
+      { q: 'Science helps us improve our lives mainly by:', opts: ['Writing stories', 'Making music', 'Understanding the natural world', 'Playing sports'], ans: 2, exp: 'Science helps us understand natural phenomena and use that knowledge for technology, medicine and more.' },
+      { q: 'Which step comes AFTER collecting data in the scientific method?', opts: ['Forming a hypothesis', 'Making an observation', 'Analysing the data', 'Asking a question'], ans: 2, exp: 'After collecting data, we analyse it — looking for patterns and trends — before drawing conclusions.' },
+      { q: '1 is the unit of measurement for:', opts: ['Temperature', 'Length', 'Time', 'Mass'], ans: 2, exp: 'This is a trick question for awareness — actually all 4 are quantities measured in science with specific SI units!' },
+    ];
+
+    // ── STATE ──────────────────────────────────────────
+    let current = 0;
+    let answers = new Array(QUESTIONS.length).fill(null);
+    let submitted = false;
+    let timerSecs = TEST_MINS * 60;
+    let timerInt = null;
+    let signalled = false;
+
+    // ── TIMER ──────────────────────────────────────────
+    function startTimer() {
+      timerInt = setInterval(() => {
+        timerSecs--;
+        const m = Math.floor(timerSecs / 60), s = timerSecs % 60;
+        const el = document.getElementById('timer-val');
+        el.textContent = `${m}:${String(s).padStart(2, '0')}`;
+        el.className = 'timer-val' + (timerSecs <= 120 ? ' warn' : '');
+        if (timerSecs <= 0) { clearInterval(timerInt); submitTest(true); }
+      }, 1000);
+    }
+
+    // ── RENDER ─────────────────────────────────────────
+    function renderNav() {
+      document.getElementById('q-nav').innerHTML = QUESTIONS.map((q, i) =>
+        `<div class="q-dot ${i === current ? 'active' : ''} ${answers[i] !== null ? 'answered' : ''}" onclick="goTo(${i})">${i + 1}</div>`
+      ).join('');
+      const done = answers.filter(a => a !== null).length;
+      document.getElementById('ans-count').textContent = `${done} / ${QUESTIONS.length} answered`;
+      document.getElementById('prog-fill').style.width = (done / QUESTIONS.length * 100) + '%';
+    }
+
+    function renderQuestion() {
+      const q = QUESTIONS[current];
+      const sel = answers[current];
+      const isSubmitted = submitted;
+      const labels = ['A', 'B', 'C', 'D'];
+
+      document.getElementById('q-area').innerHTML = `
+    <div class="q-card ${sel !== null ? 'answered' : ''}">
+      <div class="q-num">Question ${current + 1} of ${QUESTIONS.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">
+        ${q.opts.map((o, i) => {
+        let cls = '';
+        if (isSubmitted) {
+          if (i === q.ans) cls = 'correct';
+          else if (i === sel && sel !== q.ans) cls = 'wrong';
+        } else if (i === sel) cls = 'sel';
+        return `<button class="opt-btn ${cls} ${isSubmitted ? 'disabled' : ''}" onclick="${isSubmitted ? '' : 'pickOpt(' + i + ')'}">
+            <span class="opt-label">${labels[i]}</span>${o}
+          </button>`;
+      }).join('')}
+      </div>
+      ${isSubmitted ? `<div class="q-exp show">💡 ${q.exp}</div>` : ''}
+    </div>`;
+      renderNav();
+    }
+
+    function pickOpt(i) {
+      if (submitted) return;
+      answers[current] = i;
+      renderQuestion();
+    }
+    function navigate(dir) { goTo(Math.max(0, Math.min(QUESTIONS.length - 1, current + dir))); }
+    function goTo(i) { current = i; renderQuestion(); }
+
+    // ── SUBMIT ─────────────────────────────────────────
+    function submitTest(timeout = false) {
+      if (submitted) return;
+      submitted = true;
+      clearInterval(timerInt);
+
+      let correct = 0, wrong = 0, skipped = 0;
+      QUESTIONS.forEach((q, i) => {
+        if (answers[i] === null) skipped++;
+        else if (answers[i] === q.ans) correct++;
+        else wrong++;
+      });
+
+      const pct = Math.round(correct / QUESTIONS.length * 100);
+
+      document.getElementById('r-correct').textContent = correct;
+      document.getElementById('r-wrong').textContent = wrong;
+      document.getElementById('r-skipped').textContent = skipped;
+      document.getElementById('r-pct').textContent = pct + '%';
+      document.getElementById('res-score').textContent = `${correct} / ${QUESTIONS.length}`;
+      document.getElementById('res-score').style.color = pct >= 60 ? 'var(--teal)' : pct >= 40 ? 'var(--amber)' : 'var(--rose)';
+      document.getElementById('res-icon').textContent = pct >= 80 ? '🌟' : pct >= 60 ? '👍' : '📚';
+      document.getElementById('res-title').textContent = timeout ? '⏱️ Time\'s Up!' : pct >= 80 ? 'Excellent!' : pct >= 60 ? 'Good Job!' : 'Keep Practising!';
+      document.getElementById('result-overlay').classList.add('show');
+
+      // Fire signal
+      if (!signalled) {
+        signalled = true;
+        const today = new Date();
+        const dateKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        let signals = {};
+        try { signals = JSON.parse(localStorage.getItem(SIGNAL_KEY)) || {}; } catch (e) { }
+        signals[SIGNAL_ID] = { date: dateKey, ts: Date.now(), processed: false, score: pct };
+        localStorage.setItem(SIGNAL_KEY, JSON.stringify(signals));
+      }
+
+      renderQuestion(); // show correct answers
+    }
+
+    function reviewMode() {
+      document.getElementById('result-overlay').classList.remove('show');
+      current = 0; renderQuestion();
+    }
+
+    // ── INIT ──────────────────────────────────────────
+    renderQuestion();
+    startTimer();
+  </script>
+</body>
+
+</html>
